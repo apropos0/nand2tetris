@@ -1,0 +1,60 @@
+// This file is part of www.nand2tetris.org
+// and the book "The Elements of Computing Systems"
+// by Nisan and Schocken, MIT Press.
+// File name: projects/01/Mux8Way16.hdl
+/**
+ * 8-way 16-bit multiplexor:
+ * out = a if sel == 000
+ *       b if sel == 001
+ *       ...
+ *       h if sel == 111
+ */
+CHIP Mux8Way16 {
+    IN a[16], b[16], c[16], d[16],
+       e[16], f[16], g[16], h[16],
+       sel[3];
+    OUT out[16];
+
+    PARTS:
+    //// Replace this comment with your code.
+    Not(in=sel[2], out=notSelA);
+    Not(in=sel[1], out=notSelB);
+    Not(in=sel[0], out=notSelC);
+
+    //get the a and b bits, note its in this order -> abc -> 001
+    And (a=notSelA, b=notSelB, out=nn);
+    And (a=notSelA, b=sel[1], out=nb);
+    And (a=sel[2], b=notSelB, out=an);
+    And (a=sel[2], b=sel[1], out=ab);
+
+    //combine results from a and b to c for sel
+    And (a=nn, b=notSelC, out=nnn);
+    And (a=nn, b=sel[0], out=nnc);
+    And (a=nb, b=notSelC, out=nbn);
+    And (a=nb, b=sel[0], out=nbc);
+    And (a=an, b=notSelC, out=ann);
+    And (a=an, b=sel[0], out=anc);
+    And (a=ab, b=notSelC, out=abn);
+    And (a=ab, b=sel[0], out=abc);
+
+    //Get the Mux of each value, if sel = 1 return the value else return 0
+    Mux16 (b=a, sel=nnn, out=am);
+    Mux16 (b=b, sel=nnc, out=bm);
+    Mux16 (b=c, sel=nbn, out=cm);
+    Mux16 (b=d, sel=nbc, out=dm);
+    Mux16 (b=e, sel=ann, out=em);
+    Mux16 (b=f, sel=anc, out=fm);
+    Mux16 (b=g, sel=abn, out=gm);
+    Mux16 (b=h, sel=abc, out=hm);
+
+
+    //Or the responses together
+    Or16 (a=am, b=bm, out=mab);
+    Or16 (a=mab, b=cm, out=mabc);
+    Or16 (a=mabc, b=dm, out=mabcd);
+    Or16 (a=mabcd, b=em, out=mabcde);
+    Or16 (a=mabcde, b=fm, out=mabcdef);
+    Or16 (a=mabcdef, b=gm, out=mabcdefg);
+    Or16 (a=mabcdefg, b=hm, out=out);
+
+}

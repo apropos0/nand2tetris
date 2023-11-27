@@ -1,0 +1,48 @@
+// This file is part of www.nand2tetris.org
+// and the book "The Elements of Computing Systems"
+// by Nisan and Schocken, MIT Press.
+// File name: projects/01/DMux8Way.hdl
+/**
+ * 8-way demultiplexor:
+ * [a, b, c, d, e, f, g, h] = [in, 0, 0, 0, 0, 0, 0, 0] if sel == 000
+ *                            [0, in, 0, 0, 0, 0, 0, 0] if sel == 001
+ *                            ...
+ *                            [0, 0, 0, 0, 0, 0, 0, in] if sel == 111
+ */
+CHIP DMux8Way {
+    IN in, sel[3];
+    OUT a, b, c, d, e, f, g, h;
+
+    PARTS:
+    //// Replace this comment with your code.
+    Not(in=sel[2], out=notSelA);
+    Not(in=sel[1], out=notSelB);
+    Not(in=sel[0], out=notSelC);
+
+    //get the a and b bits, note its in this order -> abc -> 001
+    And (a=notSelA, b=notSelB, out=nn);
+    And (a=notSelA, b=sel[1], out=nb);
+    And (a=sel[2], b=notSelB, out=an);
+    And (a=sel[2], b=sel[1], out=ab);
+
+    //combine results from a and b to c
+    And (a=nn, b=notSelC, out=nnn);
+    And (a=nn, b=sel[0], out=nnc);
+    And (a=nb, b=notSelC, out=nbn);
+    And (a=nb, b=sel[0], out=nbc);
+    And (a=an, b=notSelC, out=ann);
+    And (a=an, b=sel[0], out=anc);
+    And (a=ab, b=notSelC, out=abn);
+    And (a=ab, b=sel[0], out=abc);
+
+    //map the outputs to the right pins
+    And (a=nnn, b=in, out=a);
+    And (a=nnc, b=in, out=b);
+    And (a=nbn, b=in, out=c);
+    And (a=nbc, b=in, out=d);
+    And (a=ann, b=in, out=e);
+    And (a=anc, b=in, out=f);
+    And (a=abn, b=in, out=g);
+    And (a=abc, b=in, out=h);
+
+}
